@@ -32,6 +32,7 @@ driver.get(url)
 #  tree 中 %26 与 %3b 同时出现 并中间 夹杂 一个 unicode 字符 三者 数量相同
 #  main 中 %26amp 与 %3b 亦同时出现 但中间 先 夹杂一个 %3b 再 夹杂一个 unicode 字符 %3b 两倍于 其他两者
 
+# 模拟归模拟 神他妈 还是 requests 好用 明知 GET 却不用
 while True:
     driver.switch_to_default_content()
     driver.switch_to_frame('tree')
@@ -56,3 +57,4 @@ while True:
             print driver.find_element_by_id('titlenav').text
             #  print driver.find_element_by_xpath('/html/body/form/div[1]/font[3]').text
 driver.quit()
+
