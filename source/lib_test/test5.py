@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # 尝试 利用 selenium 来 A-Z 保存 至 dict
+# 2017年3月29日17:09:57 实现 对 类别 1 2 级 的 打印 --> level263-22
 
 import sys
 import time
@@ -9,7 +10,8 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 url = 'http://202.200.151.19/browse/cls_browsing.php'
-driver = webdriver.PhantomJS()
+# driver = webdriver.PhantomJS()
+driver = webdriver.PhantomJS('C:\\Users\\mzc\\Downloads\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe')
 driver.get(url)
 
 # 切换到 tree frame 中
@@ -33,28 +35,27 @@ driver.get(url)
 #  main 中 %26amp 与 %3b 亦同时出现 但中间 先 夹杂一个 %3b 再 夹杂一个 unicode 字符 %3b 两倍于 其他两者
 
 # 模拟归模拟 神他妈 还是 requests 好用 明知 GET 却不用
-while True:
-    driver.switch_to_default_content()
-    driver.switch_to_frame('tree')
-    len_stepright_list1 = len(driver.find_elements_by_class_name('stepright1'))
-    for _ in range(0, len_stepright_list1):
-        stepright_list1 = driver.find_elements_by_class_name('stepright1')
-        _ele = stepright_list1[_]
+
+driver.switch_to_frame('tree')
+len_stepright_list1 = len(driver.find_elements_by_class_name('stepright1'))
+for _ in range(0, len_stepright_list1):
+    stepright_list1 = driver.find_elements_by_class_name('stepright1')
+    _ele = stepright_list1[_]
+    print _ele.text
+    _node_id = _ele.get_attribute('id')
+    driver.find_element_by_id('img_' + _node_id).click()
+    time.sleep(2)
+    len_stepright_list2 = len(driver.find_elements_by_class_name('stepright2'))
+    for _ in range(0, len_stepright_list2):
+        stepright_list2 = driver.find_elements_by_class_name('stepright2')
+        _ele = stepright_list2[_]
+        # _ele.click()
+        #  准确来说不是点击 _ele 而是 点击 其 第二 子节点 来触发
         print _ele.text
-        _node_id = _ele.get_attribute('id')
-        driver.find_element_by_id('img_' + _node_id).click()
-        time.sleep(2)
-        len_stepright_list2 = len(driver.find_elements_by_class_name('stepright2'))
-        for _ in range(0, len_stepright_list2):
-            stepright_list2 = driver.find_elements_by_class_name('stepright2')
-            _ele = stepright_list2[_]
-            _ele.click()
-            #  准确来说不是点击 _ele 而是 点击 其 第二 子节点 来触发
-            print _ele.text
-            time.sleep(2)
-            driver.switch_to_default_content()
-            driver.switch_to_frame('main')
-            print driver.find_element_by_id('titlenav').text
-            #  print driver.find_element_by_xpath('/html/body/form/div[1]/font[3]').text
+        # time.sleep(2)
+        # driver.switch_to_default_content()
+        # driver.switch_to_frame('main')
+        # print driver.find_element_by_id('titlenav').text
+        #  print driver.find_element_by_xpath('/html/body/form/div[1]/font[3]').text
 driver.quit()
 

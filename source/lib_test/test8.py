@@ -1,26 +1,93 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# http://202.200.151.19/browse/cls_browsing_tree.php
-# GET: ?s_doctype=all&cls=A&lvl=1
-# mean: 展开 A 类下 所有子类 当前 展开 第 1 级
-# GET: ?s_doctype=all&cls=A1&lvl=2
-# mean: 展开 A1类下 所有子类 当前 展开 第 2 级
-# http://docs.python-requests.org/zh_CN/latest/user/quickstart.html
-# requests.get(url, payload_dict)
-# bs 来 检测当前 还有那些 id 下 a 对应 src 是否 还是 ../tpl/images/open.png
-# 判断是否还可以展开
-# 是 则 还可以展开
-# 否 则 已经到 最低级
-# 以上过程 用一个 id: searchF(url) dict 对 来记录当前 id
-# 以上过程 仅仅使用 GET 而不用模拟 Browser
-# id_url_dict: 是否可以 嵌套 添加 以 level 区分
-[{A}
- {B}
- {C}
- {D}
- ...
- ]
-%26%23x9a6c%3B%26%23x514b%3B%26%23x601d%3B%26%23x3001%3B%26%23x6069%3B%26%23x683c%3B%26%23x65af%3B%26%23x3001%3B%26%23x5217%3B%26%23x5b81%3B%26%23x3001%3B%26%23x65af%3B%26%23x5927%3B%26%23x6797%3B%26%23x3001%3B%26%23x6bdb%3B%26%23x6cfd%3B%26%23x4e1c%3B%26%23x3001%3B%26%23x9093%3B%26%23x5c0f%3B%26%23x5e73%3B%26%23x751f%3B%26%23x5e73%3B%26%23x548c%3B%26%23x4f20%3B%26%23x8bb0%3B
+import re
+import requests
+from bs4 import BeautifulSoup, NavigableString
 
-http://202.200.151.19/browse/cls_browsing_book.php?s_doctype=all&cls=A7&clsname=%26%23x9a6c%3B%26%23x514b%3B%26%23x601d%3B%26%23x3001%3B%26%23x6069%3B%26%23x683c%3B%26%23x65af%3B%26%23x3001%3B%26%23x5217%3B%26%23x5b81%3B%26%23x3001%3B%26%23x65af%3B%26%23x5927%3B%26%23x6797%3B%26%23x3001%3B%26%23x6bdb%3B%26%23x6cfd%3B%26%23x4e1c%3B%26%23x3001%3B%26%23x9093%3B%26%23x5c0f%3B%26%23x5e73%3B%26%23x751f%3B%26%23x5e73%3B%26%23x548c%3B%26%23x4f20%3B%26%23x8bb0%3B
+# TODO(mzc)实现 对 全局 书 的统计 和 记录 数字
+# TODO(mzc) 需要想办法实现对 所有 级别 的 书 进行分别记录啊
+# 乱码的主要原因 beautifulsoup 自动将 str 转换成 Unicode
+
+browseUrl = 'http://202.200.151.19/browse/'
+
+def get_expand_tree(cls=None):
+	baseUrl = browseUrl + 'cls_browsing_tree.php'
+	if cls:
+		lvl = get_cls2level(cls)
+	else:
+		lvl = None
+	pyload = {'s_doctype': 'all', 'cls': cls, 'lvl': lvl}
+	response = requests.get(baseUrl, params=pyload)
+	print response.url
+	bsObj = BeautifulSoup(response.text, 'html.parser')
+	return bsObj
+
+def get_expand_book(cls=None, clsname=None, page=None):
+	baseUrl = browseUrl + 'cls_browsing_book.php'
+	pyload = {'s_doctype': 'all', 'cls': cls, 'clsname': clsname, 'page': page}
+	response = requests.get(baseUrl, params=pyload)
+	# print response.url
+	bsObj = BeautifulSoup(response.text, 'html.parser')
+	return bsObj
+
+def get_cls2level(cls_id):
+	cls_id = ''.join(cls_id.split('-'))
+	level = len(cls_id)
+	return level
+
+def is_bottom_lvl(ele_tag):
+	if not ele_tag.get('onclick', None):
+		return True
+	else:
+		return False
+
+def find_stepright_cls(bsObj, lvl):
+	cls = 'stepright' + str(lvl)
+	lvl_tag = bsObj.find_all(class_=cls)
+	return lvl_tag
+
+id_title_searchF = {}
+level1 = {}
+level2 = {}
+level3 = {}
+level4 = {}
+level5 = {}
+level6 = {}
+
+# 可以说明 不能 通过简单 的 字符串 来判断 我要的是第几集 好坑啊 若是 lvl 与 cls 无法匹配 就无法正常显示
+tree = get_expand_tree()
+lvl_tag = find_stepright_cls(tree, 1)
+for _ in lvl_tag:
+	level1[_['id']] = _.text
+	tree2 = get_expand_tree(_['id'][4:])
+	lvl_tag2 = find_stepright_cls(tree2, 2)
+	for _ in lvl_tag2:
+		if is_bottom_lvl(_):
+			# 已经到底啦
+			level2[_['id']] = (_.text, _.find('span')['onclick'])
+		else:
+			# 经检验 没有 WHY 在 level 2 中
+			# len(level2) = 263
+			level2[_['id']] = (_.text, _.find_all('a')[1].get('onclick', 'WHY'))
+			# tree3 = get_expand_tree(_['id'][4:])
+			# lvl_tag3 = find_stepright_cls(tree3, 3)
+			# for _ in lvl_tag3:
+			# 	if is_bottom_lvl(_):
+			# 		level3[_['id']] = _.text
+			# 	else:
+			# 		level3[_['id']] = _.text
+# 目前来说 从 当前 获取 所有 书 的 可能性 就在 lvl 2
+summ = 0
+for _ in level2.values():
+	cls, clsname = _[1][8:].split(',')
+	# print cls.strip("'"), clsname.split(')')[0].strip("'")
+	# 因为获取到 の 字符串 会有 引号 括号 乱七八糟
+	cls = cls.strip("'")
+	clsname = clsname.split(')')[0].strip("'")
+	book = get_expand_book(cls=cls, clsname=clsname)
+	# print book.find(id='titlenav').find_all('font')[3].text
+	summ += int(book.find(id='titlenav').find_all('font')[3].text)
+print summ
+# 时间大概 2 mins
+# 379966 ~= 38W

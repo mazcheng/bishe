@@ -29,7 +29,8 @@ def get_element_name(level):
 
 if __name__ == '__main__':
     url = 'http://202.200.151.19/browse/cls_browsing.php'
-    driver = webdriver.PhantomJS()
+    # driver = webdriver.PhantomJS()
+    driver = webdriver.PhantomJS('C:\\Users\\mzc\\Downloads\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe')
     driver.get(url)
     # 切换到 tree frame 中
     driver.switch_to_frame('tree')
