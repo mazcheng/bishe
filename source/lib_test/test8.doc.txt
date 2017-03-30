@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# 实现 tree 所有 类
+# http://202.200.151.19/browse/cls_browsing_tree.php
+# GET: ?s_doctype=all&cls=A&lvl=1
+# mean: 展开 A 类下 所有子类 当前 展开 第 1 级
+# GET: ?s_doctype=all&cls=A1&lvl=2
+# mean: 展开 A1类下 所有子类 当前 展开 第 2 级
+# http://docs.python-requests.org/zh_CN/latest/user/quickstart.html
+# requests.get(url, payload_dict)
+# bs 来 检测当前 还有那些 id 下 a 对应 src 是否 还是 ../tpl/images/open.png
+# 判断是否还可以展开
+# 是 则 还可以展开
+# 否 则 已经到 最低级
+# 以上过程 用一个 id: searchF(url) dict 对 来记录当前 id
+# 以上过程 仅仅使用 GET 而不用模拟 Browser
+# id_url_dict: 是否可以 嵌套 添加 以 level 区分
+[{A}
+ {B}
+ {C}
+ {D}
+ ...
+ ]
+%26%23x9a6c%3B%26%23x514b%3B%26%23x601d%3B%26%23x3001%3B%26%23x6069%3B%26%23x683c%3B%26%23x65af%3B%26%23x3001%3B%26%23x5217%3B%26%23x5b81%3B%26%23x3001%3B%26%23x65af%3B%26%23x5927%3B%26%23x6797%3B%26%23x3001%3B%26%23x6bdb%3B%26%23x6cfd%3B%26%23x4e1c%3B%26%23x3001%3B%26%23x9093%3B%26%23x5c0f%3B%26%23x5e73%3B%26%23x751f%3B%26%23x5e73%3B%26%23x548c%3B%26%23x4f20%3B%26%23x8bb0%3B
+
+http://202.200.151.19/browse/cls_browsing_book.php?s_doctype=all&cls=A7&clsname=%26%23x9a6c%3B%26%23x514b%3B%26%23x601d%3B%26%23x3001%3B%26%23x6069%3B%26%23x683c%3B%26%23x65af%3B%26%23x3001%3B%26%23x5217%3B%26%23x5b81%3B%26%23x3001%3B%26%23x65af%3B%26%23x5927%3B%26%23x6797%3B%26%23x3001%3B%26%23x6bdb%3B%26%23x6cfd%3B%26%23x4e1c%3B%26%23x3001%3B%26%23x9093%3B%26%23x5c0f%3B%26%23x5e73%3B%26%23x751f%3B%26%23x5e73%3B%26%23x548c%3B%26%23x4f20%3B%26%23x8bb0%3B
+
+最低级 与 非最低级 区别：
+是否能获取 当前 onclick 属性
+if not id_cls.get('onclick', None):
+    print 'NONE'
+
+# nodeA = bsObj.find(id='nodeA')
+# 返回所有 标签 以 node 起始
+# bsObj = get_expand_tree()
+# node = bsObj.find_all(attrs={'id': re.compile(r'^node')})
+# 22 cls
+# id_cls = {}
+# lvl = 1
+# for n in node:
+# 	# print n['id']
+# 	print type(n)
+# 	for c in n.children:
+# 		if not isinstance(c, NavigableString):
+# 			print c.contents[0]['title'].encode('latin1')
+# 		else:
+# 			id_cls[n['id']] = c.string
+	# for c in n.contents:
+	# 	for t in c[0].children:
+	# 		print t['title'].encode('latin1')
+# print de.id
+# print un.encode('latin1') 居然可以正常显示 属性值内中文 ISO-8859-1 编码 别名
+

@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+<<<<<<< HEAD
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import requests
 from bs4 import BeautifulSoup
+=======
+import re
+import requests
+from bs4 import BeautifulSoup, NavigableString
+>>>>>>> refs/remotes/origin/master
 
 # TODO(mzc)实现 对 全局 书 的统计 和 记录 数字
 # TODO(mzc) 需要想办法实现对 所有 级别 的 书 进行分别记录啊
@@ -21,6 +27,10 @@ def get_expand_tree(cls=None):
 		lvl = None
 	pyload = {'s_doctype': 'all', 'cls': cls, 'lvl': lvl}
 	response = requests.get(baseUrl, params=pyload)
+<<<<<<< HEAD
+=======
+	print response.url
+>>>>>>> refs/remotes/origin/master
 	bsObj = BeautifulSoup(response.text, 'html.parser')
 	return bsObj
 
@@ -91,4 +101,8 @@ for _ in level2.values():
 	summ += int(book.find(id='titlenav').find_all('font')[3].text)
 print summ
 # 时间大概 2 mins
+<<<<<<< HEAD
 # 379966 ~= 38W
+=======
+# 379966 ~= 38W
+>>>>>>> refs/remotes/origin/master
